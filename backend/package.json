@@ -6,6 +6,7 @@
   },
   "dependencies": {
     "@prisma/client": "^6.4.1",
+    "dotenv": "^16.4.7",
     "hono": "^4.7.2"
   },
   "devDependencies": {
