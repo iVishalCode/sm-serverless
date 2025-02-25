@@ -1,0 +1,120 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Admin {
+  id         Int            @id @default(autoincrement())
+  name       String
+  email      String         @unique
+  password   String
+  profilePic String
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
+  fee        FeeStructure[]
+}
+
+model Student {
+  id           String       @id @default(uuid())
+  name         String
+  fatherName   String
+  motherName   String
+  gender       Gender
+  grade        String
+  address      String
+  profilePic   String
+  rollNumber   String       @unique
+  bloodGroup   String? // Optional
+  mobileNumber String? // Optional
+  createdAt    DateTime     @default(now())
+  payments     Payment[]
+  feeHistory   FeeHistory[]
+  StudentFee   StudentFee[]
+}
+
+model FeeStructure {
+  id          String       @id @default(uuid())
+  name        String
+  amount      Decimal
+  dueDate     DateTime
+  frequency   FeeFrequency
+  studentFees StudentFee[]
+  adminId     Int
+  admin       Admin        @relation(fields: [adminId], references: [id])
+}
+
+model StudentFee {
+  id             String       @id @default(uuid())
+  status         FeeStatus    @default(PENDING)
+  paidAmount     Decimal      @default(0.0)
+  dueAmount      Decimal
+  dueDate        DateTime
+  payments       Payment[]
+  feeStructureId String       @unique
+  feeStructure   FeeStructure @relation(fields: [feeStructureId], references: [id])
+  studentId      String
+  student        Student      @relation(fields: [studentId], references: [id])
+}
+
+model Payment {
+  id             String         @id @default(uuid())
+  amount         Decimal
+  method         PaymentMethod
+  transactionId  String? // Gateway transaction ID
+  paymentGateway PaymentGateway
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  studentFeeId   String
+  studentFee     StudentFee     @relation(fields: [studentFeeId], references: [id])
+  studentId      String
+  student        Student        @relation(fields: [studentId], references: [id])
+}
+
+model FeeHistory {
+  id        String    @id @default(uuid())
+  studentId String
+  student   Student   @relation(fields: [studentId], references: [id])
+  amount    Decimal
+  status    FeeStatus
+  paidDate  DateTime?
+  createdAt DateTime  @default(now())
+}
+
+enum PaymentGateway {
+  STRIPE
+  RAZORPAY
+  PAYPAL
+  PAYTM
+}
+
+enum PaymentMethod {
+  CASH
+  BANK_TRANSFER
+  CREDIT_CARD
+  UPI
+  PAYPAL
+}
+
+enum FeeFrequency {
+  MONTHLY
+  QUARTERLY
+  YEARLY
+  ONE_TIME
+}
+
+enum FeeStatus {
+  PENDING
+  PARTIALLY_PAID
+  PAID
+  OVERDUE
+}
+
+enum Gender {
+  Male
+  Female
+  Others
+}
