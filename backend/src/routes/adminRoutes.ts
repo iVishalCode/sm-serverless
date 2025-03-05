@@ -1,6 +1,8 @@
 import { PrismaClient } from "@prisma/client/edge";
 import { withAccelerate } from "@prisma/extension-accelerate";
 import { Hono } from "hono";
+
+// Define Hono router
 export const adminRouter = new Hono<{
   Bindings: {
     DATABASE_URL: string;
@@ -10,8 +12,7 @@ export const adminRouter = new Hono<{
 
 adminRouter.post("/addstudent", async (c) => {
   const prisma = new PrismaClient({
-    //@ts-ignore
-    datasourcesUrl: c.env.DATABASE_URL,
+    datasourceUrl: c.env.DATABASE_URL, // Use `datasourceUrl` instead of `datasources`
   }).$extends(withAccelerate());
 
   const body = await c.req.json();
@@ -27,6 +28,7 @@ adminRouter.post("/addstudent", async (c) => {
       mobile_No: body.mobile_No,
     },
   });
+
   return c.json(
     {
       msg: "Student created successfully",
