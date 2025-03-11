@@ -24,4 +24,21 @@ model Student {
   address    String
   grade      String
   mobile_No  String
+  fees       Fee[]
+}
+
+model Fee {
+  id        String    @id @default(uuid())
+  amount    Int
+  status    FeeStatus @default(PENDING)
+  dueDate   DateTime
+  paidDate  DateTime?
+  Student   Student?  @relation(fields: [studentId], references: [id])
+  studentId Int?
+  createdAt DateTime  @default(now())
+}
+
+enum FeeStatus {
+  PENDING
+  PAID
 }
