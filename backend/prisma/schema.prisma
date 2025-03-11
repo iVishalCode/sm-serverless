@@ -18,6 +18,7 @@ model Student {
   name       String
   adhar_No   String @unique
   fatherName String
+  imageUrl   String
   motherName String
   dob        String
   address    String
